@@ -56,13 +56,18 @@ def add_stock():
 
 def track_stocks():
     # Get the target price once at the start of the thread
+    stock_list = load_stocks()
+    targets = {}
     try:
-        target = float(input("\nAlert when price is ABOVE: $"))
+        for stock in stock_list:
+            target_input = input(f"Enter target price for {stock}: $")
+            targets[stock] = float(target_input)
+
     except ValueError:
         print("[!] Invalid number. Monitoring canceled.")
         return
 
-    print(f"\n[Monitoring Started for target: ${target:0.2f}]")
+    print(f"\n[Monitoring Started for {len(stock_list)} stocks]")
     print("Ticker | Current Price | Status")
     print("-" * 35)
     
@@ -80,12 +85,12 @@ def track_stocks():
                     
                     print(f"{stock:6} | ${price:9.2f} | Checked")
                     
-                    margin = 0.0075 * target
+                    margin = 0.0075 * targets[stock]
                     #check if price is within 0.75% of the target price
-                    if target - margin <= price <= target + margin:
+                    if targets[stock] - margin <= price <= targets[stock] + margin:
                         notify(
                             f"{stock} Alert!", 
-                            f"Current: ${price:9.2f} | Target: ${target:9.2f}"
+                            f"Current: ${price:9.2f} | Target: ${targets[stock]:9.2f}"
                         )
 
                 else:
